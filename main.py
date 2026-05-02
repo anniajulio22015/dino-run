@@ -17,23 +17,23 @@ RED = (220, 60, 60)
 WHITE = (255, 255, 255)
 
 # Load sprites
-flor_normal_img= pygame.image.load(os.path.join("sprits","flor normal.png")).convert_alpha()
-agachada_img= pygame.image.load(os.path.join("sprits","agachada.png")).convert_alpha()
-dino_normal_img= pygame.image.load(os.path.join("sprits","fuego.png")).convert_alpha()
-dino_normal_img= pygame.image.load(os.path.join("sprits","roca.png")).convert_alpha()
-dino_normal_img= pygame.image.load(os.path.join("sprits","pajaro.png")).convert_alpha()
+flor_normal_img= pygame.image.load(os.path.join("images","flor normal.png")).convert_alpha()
+agachada_img= pygame.image.load(os.path.join("images","agachada.png")).convert_alpha()
+fuego_img= pygame.image.load(os.path.join("images","fuego.png")).convert_alpha()
+roca_img= pygame.image.load(os.path.join("images","roca.png")).convert_alpha()
+pajaro_img= pygame.image.load(os.path.join("images","pajaro azul.png")).convert_alpha()
 
 # Scale sprites to expected sizes
-DINO_NORMAL_IMG = pygame.transform.scale(DINO_NORMAL_IMG, (60, 80))
-DINO_DUCK_IMG = pygame.transform.scale(DINO_DUCK_IMG, (60, 40))
-CACTUS_IMG = pygame.transform.scale(CACTUS_IMG, (30, 60))
-ROCK_IMG = pygame.transform.scale(ROCK_IMG, (40, 40))
-BIRD_IMG = pygame.transform.scale(BIRD_IMG, (50, 30))
+flor_normal_IMG = pygame.transform.scale(flor_normal_img, (60, 80))
+agachada_IMG = pygame.transform.scale(agachada_img, (60, 40))
+fuego_IMG = pygame.transform.scale(fuego_img, (30, 60))
+roca_IMG = pygame.transform.scale(roca_img, (40, 40))
+pajaro_IMG = pygame.transform.scale(pajaro_img, (50, 30))
 
 
 def run_game():
     # Dino settings
-    dino_img = DINO_NORMAL_IMG
+    dino_img = flor_normal_IMG
     dino = pygame.Rect(80, HEIGHT - 120, 60, 80)
     dino_vel_y = 0
     gravity = 0.8
@@ -46,7 +46,7 @@ def run_game():
 
     # Obstacles and birds
     obstacles = []   # list of (rect, image)
-    birds = []       # list of rects
+    pajaros = []       # list of rects
     spawn_timer = 0
     spawn_delay = 90
 
@@ -75,13 +75,13 @@ def run_game():
         # Duck
         if keys[pygame.K_DOWN] and on_ground:
             if not is_ducking:
-                dino_img = DINO_DUCK_IMG
+                dino_img = agachada_img
                 dino.height = 40
                 dino.y += 40
                 is_ducking = True
         else:
             if is_ducking:
-                dino_img = DINO_NORMAL_IMG
+                dino_img = flor_normal_IMG
                 dino.y -= 40
                 dino.height = 80
                 is_ducking = False
@@ -98,21 +98,21 @@ def run_game():
         # Spawn obstacles and birds
         spawn_timer += 1
         if spawn_timer >= spawn_delay:
-            choice = random.choice(["cactus", "rock", "bird"])
+            choice = random.choice(["fuego", "roca", "pajaro"])
 
-            if choice == "cactus":
+            if choice == "fuego":
                 rect = pygame.Rect(WIDTH + 20, ground_y - 60, 30, 60)
-                obstacles.append((rect, CACTUS_IMG))
+                obstacles.append((rect, fuego_IMG))
 
-            elif choice == "rock":
+            elif choice == "roca":
                 rect = pygame.Rect(WIDTH + 20, ground_y - 40, 40, 40)
-                obstacles.append((rect, ROCK_IMG))
+                obstacles.append((rect, roca_IMG))
 
             else:
                 # Pájaros a altura que obliga a agacharse
                 y = random.choice([ground_y - 80, ground_y - 90])
-                bird = pygame.Rect(WIDTH + 20, y, 50, 30)
-                birds.append(bird)
+                pajaro= pygame.Rect(WIDTH + 20, y, 50, 30)
+                pajaros.append(pajaro)
 
             spawn_timer = 0
             if spawn_delay > 50:
@@ -126,10 +126,10 @@ def run_game():
                 score += 1
 
         # Move birds
-        for bird in birds[:]:
-            bird.x -= speed + 2
-            if bird.right < 0:
-                birds.remove(bird)
+        for pajaro in pajaros[:]:
+            pajaro.x -= speed + 2
+            if pajaro.right < 0:
+                pajaros.remove(pajaro)
                 score += 2
 
         # Collision
@@ -137,8 +137,8 @@ def run_game():
             if dino.colliderect(rect):
                 running = False
 
-        for bird in birds:
-            if dino.colliderect(bird):
+        for pajaro in pajaros:
+            if dino.colliderect(pajaro):
                 running = False
 
         # Increase speed
@@ -155,8 +155,8 @@ def run_game():
             screen.blit(img, (rect.x, rect.y))
 
         # Draw birds
-        for bird in birds:
-            screen.blit(BIRD_IMG, (bird.x, bird.y))
+        for pajaro in pajaros:
+            screen.blit(pajaro_IMG, (pajaro.x, pajaro.y))
 
         # UI
         score_text = FONT.render(f"Score: {score}", True, WHITE)
